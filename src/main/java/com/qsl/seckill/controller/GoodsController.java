@@ -55,21 +55,21 @@ public class GoodsController {
      * @return
      */
     @RequestMapping(value = "/to_list", produces = "text/html")
-    //@ResponseBody
+    @ResponseBody
     public String toLogin(HttpServletRequest request, HttpServletResponse response, Model model,
-                          @CookieValue(value = COOKIE_NAME_TOKEN, required = false) String cookieToken,
-                          @RequestParam(value = COOKIE_NAME_TOKEN, required = false) String paramToken,
+//                          @CookieValue(value = COOKIE_NAME_TOKEN, required = false) String cookieToken,
+//                          @RequestParam(value = COOKIE_NAME_TOKEN, required = false) String paramToken,
                           SeckillUser user) {
         model.addAttribute("user", user);
-        //查询商品列表
-        List<GoodsVo> goodsList = goodsService.listGoodsVo();
-        model.addAttribute("goodsList", goodsList);
-
-        /*//取页面缓存 return "goods_list";
+        //取页面缓存 return "goods_list";
         String html = redisService.get(GoodsKey.getGoodList, "", String.class);
         if (StringUtils.isNotEmpty(html)) {
             return html;
         }
+
+        //查询商品列表
+        List<GoodsVo> goodsList = goodsService.listGoodsVo();
+        model.addAttribute("goodsList", goodsList);
 
         SpringWebContext springWebContext = new SpringWebContext(request, response, request.getServletContext(),
                 request.getLocale(), model.asMap(), applicationContext);
@@ -79,14 +79,14 @@ public class GoodsController {
             redisService.set(GoodsKey.getGoodList, "", html);
         }
 
-        return html;*/
+        return html;
 
 //        if (StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {
 //            return "login";
 //        }
 //        String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
 //        SeckillUser user = seckillUserService.getByToken(token);
-        return "goods_list";
+//        return "goods_list";
     }
 
     @RequestMapping("/to_detail/{goodsId}")

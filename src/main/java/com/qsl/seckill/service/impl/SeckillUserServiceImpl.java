@@ -27,11 +27,6 @@ public class SeckillUserServiceImpl implements SeckillUserService {
     RedisService redisService;
 
     @Override
-    public SeckillUser getById(long id) {
-        return seckillUserDao.getById(id);
-    }
-
-    @Override
     public ServerResponse login(LoginVo loginVo) {
         if (loginVo == null) {
             return ServerResponse.createByErrorMessage("无信息");
@@ -52,6 +47,27 @@ public class SeckillUserServiceImpl implements SeckillUserService {
         }
 
         return ServerResponse.createBySuccess(user);
+    }
+
+    /**
+     * 根据用户id获取用户信息
+     * （使用对象级缓存）
+     * @param id
+     * @return
+     */
+    @Override
+    public SeckillUser getById(long id) {
+        //取缓存
+        SeckillUser user = redisService.get(SeckillUserKey.getById, "" + id, SeckillUser.class);
+        if (user != null) {
+            return user;
+        }
+        //取数据库
+        user = seckillUserDao.getById(id);
+        if (user != null) {
+            redisService.set(SeckillUserKey.getById, "" + id, user);
+        }
+        return user;
     }
 
     @Override
