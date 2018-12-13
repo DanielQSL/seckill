@@ -9,13 +9,15 @@ import com.qsl.seckill.vo.GoodsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.spring4.context.SpringWebContext;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -41,42 +43,50 @@ public class GoodsController {
     @Autowired
     ThymeleafViewResolver thymeleafViewResolver;
 
+    @Autowired
+    ApplicationContext applicationContext;
+
+    /**
+     * 商品列表
+     * 直接返回html源代码
+     *
+     * @param model
+     * @param user
+     * @return
+     */
     @RequestMapping(value = "/to_list", produces = "text/html")
-    @ResponseBody
-    public String toLogin(Model model,
-//                          @CookieValue(value = COOKIE_NAME_TOKEN, required = false) String cookieToken,
-//                          @RequestParam(value = COOKIE_NAME_TOKEN, required = false) String paramToken
+    //@ResponseBody
+    public String toLogin(HttpServletRequest request, HttpServletResponse response, Model model,
+                          @CookieValue(value = COOKIE_NAME_TOKEN, required = false) String cookieToken,
+                          @RequestParam(value = COOKIE_NAME_TOKEN, required = false) String paramToken,
                           SeckillUser user) {
-//        if (StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {
-//            return "login";
-//        }
-//        String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
-//        SeckillUser user = seckillUserService.getByToken(token);
         model.addAttribute("user", user);
         //查询商品列表
         List<GoodsVo> goodsList = goodsService.listGoodsVo();
         model.addAttribute("goodsList", goodsList);
 
-        //return "goods_list";
+        /*//取页面缓存 return "goods_list";
         String html = redisService.get(GoodsKey.getGoodList, "", String.class);
         if (StringUtils.isNotEmpty(html)) {
             return html;
         }
-//
-//        //手动渲染
-//        thymeleafViewResolver.getTemplateEngine().process("goods_list","44444" );
-//        if (StringUtils.isNotEmpty(html)) {
-//            redisService.set(GoodsKey.getGoodList, "", html);
+
+        SpringWebContext springWebContext = new SpringWebContext(request, response, request.getServletContext(),
+                request.getLocale(), model.asMap(), applicationContext);
+        //手动渲染
+        html = thymeleafViewResolver.getTemplateEngine().process("goods_list", springWebContext);
+        if (StringUtils.isNotEmpty(html)) {
+            redisService.set(GoodsKey.getGoodList, "", html);
+        }
+
+        return html;*/
+
+//        if (StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)) {
+//            return "login";
 //        }
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        })
-
-        return null;
+//        String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
+//        SeckillUser user = seckillUserService.getByToken(token);
+        return "goods_list";
     }
 
     @RequestMapping("/to_detail/{goodsId}")
