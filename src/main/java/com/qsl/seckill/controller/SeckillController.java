@@ -43,6 +43,7 @@ public class SeckillController {
     /**
      * 秒杀
      * qps:76.7/sec  请求数：1000*8
+     *
      * @param model
      * @param user
      * @param goodsId
@@ -58,7 +59,7 @@ public class SeckillController {
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
         int stock = goods.getStockCount();
         if (stock <= 0) {
-            model.addAttribute("errMsg", ResponseCode.ERROR.getDesc());
+            model.addAttribute("errMsg", ResponseCode.SECKILL_SELLEDOUT.getDesc());
             return "seckill_fail";
         }
         //判断是否已经秒杀到了

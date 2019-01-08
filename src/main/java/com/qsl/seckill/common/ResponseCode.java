@@ -10,7 +10,8 @@ public enum ResponseCode {
     SERVER_ERROR(-100, "服务端异常"),
 
     SECKILL_OVER(500501, "商品已经秒杀完毕"),
-    REPEATE_SECKILL(500502, "不能重复秒杀");
+    REPEATE_SECKILL(500502, "不能重复秒杀"),
+    SECKILL_SELLEDOUT(500503, "商品已经卖完");
 
     private final int code;
     private final String desc;

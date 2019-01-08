@@ -46,26 +46,34 @@ public class GoodsController {
     @Autowired
     ApplicationContext applicationContext;
 
+//    /**
+//     * 商品列表
+//     * qps:86.7/sec  请求数：1000*8
+//     * @param model
+//     * @param user
+//     * @return
+//     */
+//    @RequestMapping(value = "/to_list")
+//    public String toLogin(Model model, SeckillUser user) {
+//        model.addAttribute("user", user);
+//
+//        //查询商品列表
+//        List<GoodsVo> goodsList = goodsService.listGoodsVo();
+//        model.addAttribute("goodsList", goodsList);
+//
+//        return "goods_list";
+//    }
+
     /**
      * 商品列表
      * 直接返回html源代码
      * qps:86.7/sec  请求数：1000*8
+     *
      * @param model
      * @param user
      * @return
      */
-    @RequestMapping(value = "/to_list")
-    public String toLogin(Model model, SeckillUser user) {
-        model.addAttribute("user", user);
-
-        //查询商品列表
-        List<GoodsVo> goodsList = goodsService.listGoodsVo();
-        model.addAttribute("goodsList", goodsList);
-
-        return "goods_list";
-    }
-
-    /*@RequestMapping(value = "/to_list", produces = "text/html")
+    @RequestMapping(value = "/to_list", produces = "text/html")
     @ResponseBody
     public String toLogin(HttpServletRequest request, HttpServletResponse response, Model model,
 //                          @CookieValue(value = COOKIE_NAME_TOKEN, required = false) String cookieToken,
@@ -98,12 +106,29 @@ public class GoodsController {
 //        String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
 //        SeckillUser user = seckillUserService.getByToken(token);
 //        return "goods_list";
-    }*/
+    }
 
-    @RequestMapping("/to_detail/{goodsId}")
-    public String toDetail(Model model, SeckillUser user,
+    /**
+     * 秒杀商品详情页
+     *
+     * @param request
+     * @param response
+     * @param model
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping(value = "/to_detail/{goodsId}", produces = "text/html")
+    @ResponseBody
+    public String toDetail(HttpServletRequest request, HttpServletResponse response,
+                           Model model, SeckillUser user,
                            @PathVariable("goodsId") long goodsId) {
         model.addAttribute("user", user);
+        //取详情页面缓存
+        String html = redisService.get(GoodsKey.getGoodDetail, "" + goodsId, String.class);
+        if (StringUtils.isNotEmpty(html)) {
+            return html;
+        }
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
         model.addAttribute("goods", goods);
 
@@ -115,10 +140,12 @@ public class GoodsController {
         int seckillStatus = 0;
         int remainSeconds = 0;
 
-        if (now < startDate) {//秒杀还没开始，倒计时
+        if (now < startDate) {
+            //秒杀还没开始，倒计时
             seckillStatus = 0;
             remainSeconds = (int) ((startDate - now) / 1000);
-        } else if (now > endDate) {//秒杀以结束
+        } else if (now > endDate) {
+            //秒杀以结束
             seckillStatus = 2;
             remainSeconds = -1;
         } else {//秒杀进行中
@@ -128,7 +155,16 @@ public class GoodsController {
         model.addAttribute("seckillStatus", seckillStatus);
         model.addAttribute("remainSeconds", remainSeconds);
 
-        return "goods_detail";
+        SpringWebContext springWebContext = new SpringWebContext(request, response, request.getServletContext(),
+                request.getLocale(), model.asMap(), applicationContext);
+        //手动渲染
+        html = thymeleafViewResolver.getTemplateEngine().process("goods_detail", springWebContext);
+        if (StringUtils.isNotEmpty(html)) {
+            redisService.set(GoodsKey.getGoodDetail, "" + goodsId, html);
+        }
+
+        return html;
+        //return "goods_detail";
     }
 
 }
