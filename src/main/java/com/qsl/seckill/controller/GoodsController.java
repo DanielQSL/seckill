@@ -46,13 +46,6 @@ public class GoodsController {
     @Autowired
     ApplicationContext applicationContext;
 
-//    /**
-//     * 商品列表
-//     * qps:86.7/sec  请求数：1000*8
-//     * @param model
-//     * @param user
-//     * @return
-//     */
 //    @RequestMapping(value = "/to_list")
 //    public String toLogin(Model model, SeckillUser user) {
 //        model.addAttribute("user", user);
@@ -67,7 +60,7 @@ public class GoodsController {
     /**
      * 商品列表
      * 直接返回html源代码
-     * qps:86.7/sec  请求数：1000*8
+     * 第一次：qps:86.7/sec  请求数：1000*8
      *
      * @param model
      * @param user

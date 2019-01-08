@@ -41,8 +41,8 @@ mybatis:
 redis:
   host: 47.97.189.167
   port: 6379
-  timeout: 10
-  poolMaxTotal: 1000
+  timeout: 150
+  poolMaxTotal: 5000
   poolMaxIdle: 500
   poolMaxWait: 500
   password: qwer1234
