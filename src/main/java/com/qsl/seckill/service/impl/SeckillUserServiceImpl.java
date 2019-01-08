@@ -1,5 +1,6 @@
 package com.qsl.seckill.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.qsl.seckill.common.ResponseCode;
 import com.qsl.seckill.common.ServerResponse;
 import com.qsl.seckill.dao.SeckillUserDao;
@@ -38,6 +39,7 @@ public class SeckillUserServiceImpl implements SeckillUserService {
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.MOBILE_NOT_EXIST.getCode(), ResponseCode.MOBILE_NOT_EXIST.getDesc());
         }
+        DateUtil.yesterday();
         //验证密码
         String dbPassword = user.getPassword();
         String saltDB = user.getSalt();

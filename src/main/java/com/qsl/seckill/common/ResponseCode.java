@@ -7,7 +7,10 @@ public enum ResponseCode {
     NEED_LOGIN(10, "NEED_LOGIN"),
     ILLEGAL_ARGUMENT(2, "ILLEGAL_ARGUMENT"),
     MOBILE_NOT_EXIST(50021, "手机号不存在"),
-    SERVER_ERROR(-100,"服务端异常");
+    SERVER_ERROR(-100, "服务端异常"),
+
+    SECKILL_OVER(500501, "商品已经秒杀完毕"),
+    REPEATE_SECKILL(500502, "不能重复秒杀");
 
     private final int code;
     private final String desc;
@@ -24,4 +27,4 @@ public enum ResponseCode {
     public String getDesc() {
         return desc;
     }
-    }
+}

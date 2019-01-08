@@ -42,9 +42,9 @@ public class LoginController {
         return "login";
     }
 
-    @RequestMapping("/do_login")
+    /*@RequestMapping("/do_login")
     @ResponseBody
-    public ServerResponse<Boolean> doLogin(@Valid LoginVo loginVo,
+    public ServerResponse<String> doLogin(@Valid LoginVo loginVo,
                                            HttpServletRequest request, HttpServletResponse response) {
         log.info(loginVo.toString());
 //        //参数校验
@@ -66,5 +66,27 @@ public class LoginController {
         CookieUtils.setCookie(request, response, COOKIE_NAME_TOKEN, token);
         //登录
         return result;
+    }*/
+
+    /**
+     * 用户生成测试用户使用
+     * @param loginVo
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/do_login")
+    @ResponseBody
+    public ServerResponse<String> doLogin(@Valid LoginVo loginVo,
+                          HttpServletRequest request, HttpServletResponse response) {
+        log.info(loginVo.toString());
+        ServerResponse result = seckillUserService.login(loginVo);
+        //生成cookie
+        String token = UUIDUtil.uuid();
+        redisService.set(SeckillUserKey.token, token, result.getData());
+        CookieUtils.setCookie(request, response, COOKIE_NAME_TOKEN, token);
+        //登录
+        return ServerResponse.createBySuccess(token);
     }
+
 }

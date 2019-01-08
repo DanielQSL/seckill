@@ -49,12 +49,23 @@ public class GoodsController {
     /**
      * 商品列表
      * 直接返回html源代码
-     *
+     * qps:86.7/sec  请求数：1000*8
      * @param model
      * @param user
      * @return
      */
-    @RequestMapping(value = "/to_list", produces = "text/html")
+    @RequestMapping(value = "/to_list")
+    public String toLogin(Model model, SeckillUser user) {
+        model.addAttribute("user", user);
+
+        //查询商品列表
+        List<GoodsVo> goodsList = goodsService.listGoodsVo();
+        model.addAttribute("goodsList", goodsList);
+
+        return "goods_list";
+    }
+
+    /*@RequestMapping(value = "/to_list", produces = "text/html")
     @ResponseBody
     public String toLogin(HttpServletRequest request, HttpServletResponse response, Model model,
 //                          @CookieValue(value = COOKIE_NAME_TOKEN, required = false) String cookieToken,
@@ -87,7 +98,7 @@ public class GoodsController {
 //        String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
 //        SeckillUser user = seckillUserService.getByToken(token);
 //        return "goods_list";
-    }
+    }*/
 
     @RequestMapping("/to_detail/{goodsId}")
     public String toDetail(Model model, SeckillUser user,
