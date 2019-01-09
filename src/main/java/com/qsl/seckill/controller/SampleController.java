@@ -2,6 +2,7 @@ package com.qsl.seckill.controller;
 
 import com.qsl.seckill.common.ServerResponse;
 import com.qsl.seckill.domain.User;
+import com.qsl.seckill.rabbitmq.MQSender;
 import com.qsl.seckill.redis.RedisService;
 import com.qsl.seckill.redis.UserKey;
 import com.qsl.seckill.service.UserService;
@@ -28,6 +29,23 @@ public class SampleController {
 
     @Autowired
     RedisService redisService;
+
+    @Autowired
+    MQSender sender;
+
+    @RequestMapping("/mq/topic")
+    @ResponseBody
+    public ServerResponse<String> mqTopic(Model model) {
+        sender.sendTopic("hello,rabbitmq");
+        return ServerResponse.createBySuccess();
+    }
+
+    @RequestMapping("/mq")
+    @ResponseBody
+    public ServerResponse<String> mq(Model model) {
+        sender.send("hello,rabbitmq");
+        return ServerResponse.createBySuccess();
+    }
 
     @RequestMapping("/thymeleaf")
     public String thymeleaf(Model model) {
