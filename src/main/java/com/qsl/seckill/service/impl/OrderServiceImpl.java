@@ -4,6 +4,8 @@ import com.qsl.seckill.dao.OrderDao;
 import com.qsl.seckill.domain.OrderInfo;
 import com.qsl.seckill.domain.SeckillOrder;
 import com.qsl.seckill.domain.SeckillUser;
+import com.qsl.seckill.redis.OrderKey;
+import com.qsl.seckill.redis.RedisService;
 import com.qsl.seckill.service.OrderService;
 import com.qsl.seckill.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +24,24 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     OrderDao orderDao;
 
+    @Autowired
+    RedisService redisService;
+
     @Override
     public SeckillOrder getSeckillOrderByUserIdAndGoodsId(long userId, long goodsId) {
-        return orderDao.getSeckillOrderByUserIdAndGoodsId(userId, goodsId);
+        //return orderDao.getSeckillOrderByUserIdAndGoodsId(userId, goodsId);
+        return redisService.get(OrderKey.getSeckillOrderByUidGid, "_" + userId + "_" + goodsId, SeckillOrder.class);
+    }
+
+    /**
+     * 根据id获取订单信息
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public OrderInfo getOrderById(long orderId) {
+        return orderDao.getOrderById(orderId);
     }
 
     /**
@@ -57,6 +74,9 @@ public class OrderServiceImpl implements OrderService {
 
         orderDao.insertSeckillOrder(order);
 
+        redisService.set(OrderKey.getSeckillOrderByUidGid, "_" + user.getId() + "_" + goods.getId(), order);
+
         return orderInfo;
     }
+
 }

@@ -1,5 +1,6 @@
 package com.qsl.seckill.service;
 
+import com.qsl.seckill.common.ServerResponse;
 import com.qsl.seckill.domain.OrderInfo;
 import com.qsl.seckill.domain.SeckillUser;
 import com.qsl.seckill.vo.GoodsVo;
@@ -11,5 +12,5 @@ import org.springframework.stereotype.Service;
  */
 public interface SeckillService {
 
-    OrderInfo seckill(SeckillUser user, GoodsVo goods);
+    ServerResponse<OrderInfo> seckill(SeckillUser user, GoodsVo goods);
 }

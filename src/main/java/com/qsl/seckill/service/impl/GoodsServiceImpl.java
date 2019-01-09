@@ -31,9 +31,9 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public void reduceStock(GoodsVo goods) {
+    public int reduceStock(GoodsVo goods) {
         SeckillGoods updateGood = new SeckillGoods();
         updateGood.setGoodsId(goods.getId());
-        goodsDao.reduceStock(updateGood);
+        return goodsDao.reduceStock(updateGood);
     }
 }

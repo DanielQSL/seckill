@@ -1,6 +1,7 @@
 package com.qsl.seckill.controller;
 
 import com.qsl.seckill.common.ResponseCode;
+import com.qsl.seckill.common.ServerResponse;
 import com.qsl.seckill.domain.OrderInfo;
 import com.qsl.seckill.domain.SeckillOrder;
 import com.qsl.seckill.domain.SeckillUser;
@@ -15,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 秒杀业务
@@ -49,32 +52,27 @@ public class SeckillController {
      * @param goodsId
      * @return
      */
-    @RequestMapping("/do_seckill")
-    public String seckill(Model model, SeckillUser user, @RequestParam("goodsId") long goodsId) {
+    @RequestMapping(value = "/do_seckill", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<OrderInfo> seckill(Model model, SeckillUser user, @RequestParam("goodsId") long goodsId) {
         model.addAttribute("user", user);
         if (user == null) {
-            return "login";
+            return ServerResponse.createByErrorMessage(ResponseCode.SESSION_ERROR.getDesc());
         }
         //判断库存
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
         int stock = goods.getStockCount();
         if (stock <= 0) {
-            model.addAttribute("errMsg", ResponseCode.SECKILL_SELLEDOUT.getDesc());
-            return "seckill_fail";
+            return ServerResponse.createByErrorMessage(ResponseCode.SECKILL_SELLEDOUT.getDesc());
         }
         //判断是否已经秒杀到了
         SeckillOrder order = orderService.getSeckillOrderByUserIdAndGoodsId(user.getId(), goodsId);
         if (order != null) {
-            model.addAttribute("errMsg", ResponseCode.REPEATE_SECKILL.getDesc());
-            return "seckill_fail";
+            return ServerResponse.createByErrorMessage(ResponseCode.REPEATE_SECKILL.getDesc());
         }
 
         //减库存，下订单，写入秒杀订单
-        OrderInfo orderInfo = seckillService.seckill(user, goods);
-        model.addAttribute("orderInfo", orderInfo);
-        model.addAttribute("goods", goods);
-
-        return "order_detail";
+        return seckillService.seckill(user, goods);
     }
 
 }

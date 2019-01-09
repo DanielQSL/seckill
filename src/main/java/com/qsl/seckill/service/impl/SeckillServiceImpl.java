@@ -1,5 +1,7 @@
 package com.qsl.seckill.service.impl;
 
+import com.qsl.seckill.common.ResponseCode;
+import com.qsl.seckill.common.ServerResponse;
 import com.qsl.seckill.domain.Goods;
 import com.qsl.seckill.domain.OrderInfo;
 import com.qsl.seckill.domain.SeckillUser;
@@ -26,13 +28,16 @@ public class SeckillServiceImpl implements SeckillService {
 
     @Override
     @Transactional
-    public OrderInfo seckill(SeckillUser user, GoodsVo goods) {
+    public ServerResponse<OrderInfo> seckill(SeckillUser user, GoodsVo goods) {
         //减库存，下订单，写入秒杀订单
         //1.减库存
-        goodsService.reduceStock(goods);
+        int reduceResult = goodsService.reduceStock(goods);
+        if (reduceResult != 1) {
+            return ServerResponse.createByErrorMessage(ResponseCode.SECKILL_OVER.getDesc());
+        }
         //2.创建订单
         OrderInfo order = orderService.createOrder(user, goods);
 
-        return order;
+        return ServerResponse.createBySuccess(order);
     }
 }
