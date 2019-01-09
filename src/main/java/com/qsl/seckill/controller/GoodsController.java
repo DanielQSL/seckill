@@ -1,10 +1,12 @@
 package com.qsl.seckill.controller;
 
+import com.qsl.seckill.common.ServerResponse;
 import com.qsl.seckill.domain.SeckillUser;
 import com.qsl.seckill.redis.GoodsKey;
 import com.qsl.seckill.redis.RedisService;
 import com.qsl.seckill.service.GoodsService;
 import com.qsl.seckill.service.SeckillUserService;
+import com.qsl.seckill.vo.GoodsDetailVo;
 import com.qsl.seckill.vo.GoodsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -68,10 +70,10 @@ public class GoodsController {
      */
     @RequestMapping(value = "/to_list", produces = "text/html")
     @ResponseBody
-    public String toLogin(HttpServletRequest request, HttpServletResponse response, Model model,
+    public String toList(HttpServletRequest request, HttpServletResponse response, Model model,
 //                          @CookieValue(value = COOKIE_NAME_TOKEN, required = false) String cookieToken,
 //                          @RequestParam(value = COOKIE_NAME_TOKEN, required = false) String paramToken,
-                          SeckillUser user) {
+                         SeckillUser user) {
         model.addAttribute("user", user);
         //取页面缓存 return "goods_list";
         String html = redisService.get(GoodsKey.getGoodList, "", String.class);
@@ -111,11 +113,11 @@ public class GoodsController {
      * @param goodsId
      * @return
      */
-    @RequestMapping(value = "/to_detail/{goodsId}", produces = "text/html")
+    @RequestMapping(value = "/to_detail2/{goodsId}", produces = "text/html")
     @ResponseBody
-    public String toDetail(HttpServletRequest request, HttpServletResponse response,
-                           Model model, SeckillUser user,
-                           @PathVariable("goodsId") long goodsId) {
+    public String toDetail2(HttpServletRequest request, HttpServletResponse response,
+                            Model model, SeckillUser user,
+                            @PathVariable("goodsId") long goodsId) {
         model.addAttribute("user", user);
         //取详情页面缓存
         String html = redisService.get(GoodsKey.getGoodDetail, "" + goodsId, String.class);
@@ -158,6 +160,54 @@ public class GoodsController {
 
         return html;
         //return "goods_detail";
+    }
+
+    /**
+     * 秒杀商品详情页（V2）
+     *
+     * @param request
+     * @param response
+     * @param model
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping(value = "/detail/{goodsId}")
+    @ResponseBody
+    public ServerResponse<GoodsDetailVo> toDetail(HttpServletRequest request, HttpServletResponse response,
+                                                  Model model, SeckillUser user,
+                                                  @PathVariable("goodsId") long goodsId) {
+        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
+        model.addAttribute("goods", goods);
+
+        //秒杀时间
+        long startDate = goods.getStartDate().getTime();
+        long endDate = goods.getEndDate().getTime();
+        long now = System.currentTimeMillis();
+
+        int seckillStatus = 0;
+        int remainSeconds = 0;
+
+        if (now < startDate) {
+            //秒杀还没开始，倒计时
+            seckillStatus = 0;
+            remainSeconds = (int) ((startDate - now) / 1000);
+        } else if (now > endDate) {
+            //秒杀以结束
+            seckillStatus = 2;
+            remainSeconds = -1;
+        } else {//秒杀进行中
+            seckillStatus = 1;
+            remainSeconds = 0;
+        }
+
+        GoodsDetailVo detail = new GoodsDetailVo();
+        detail.setGoodsVo(goods);
+        detail.setSeckillUser(user);
+        detail.setRemainSeconds(remainSeconds);
+        detail.setSeckillStatus(seckillStatus);
+
+        return ServerResponse.createBySuccess(detail);
     }
 
 }
