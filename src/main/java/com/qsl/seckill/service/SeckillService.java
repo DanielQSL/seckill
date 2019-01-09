@@ -13,4 +13,6 @@ import org.springframework.stereotype.Service;
 public interface SeckillService {
 
     ServerResponse<OrderInfo> seckill(SeckillUser user, GoodsVo goods);
+
+    long getSeckillResult(Long userId, long goodsId);
 }

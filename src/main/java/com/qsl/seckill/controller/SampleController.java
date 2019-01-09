@@ -33,19 +33,26 @@ public class SampleController {
     @Autowired
     MQSender sender;
 
-    @RequestMapping("/mq/topic")
-    @ResponseBody
-    public ServerResponse<String> mqTopic(Model model) {
-        sender.sendTopic("hello,rabbitmq");
-        return ServerResponse.createBySuccess();
-    }
-
-    @RequestMapping("/mq")
-    @ResponseBody
-    public ServerResponse<String> mq(Model model) {
-        sender.send("hello,rabbitmq");
-        return ServerResponse.createBySuccess();
-    }
+//    @RequestMapping("/mq/topic")
+//    @ResponseBody
+//    public ServerResponse<String> topic(Model model) {
+//        sender.sendTopic("hello,rabbitmq");
+//        return ServerResponse.createBySuccess();
+//    }
+//
+//    @RequestMapping("/mq/fanout")
+//    @ResponseBody
+//    public ServerResponse<String> fanout(Model model) {
+//        sender.sendFanout("hello,rabbitmq");
+//        return ServerResponse.createBySuccess();
+//    }
+//
+//    @RequestMapping("/mq")
+//    @ResponseBody
+//    public ServerResponse<String> mq(Model model) {
+//        sender.send("hello,rabbitmq");
+//        return ServerResponse.createBySuccess();
+//    }
 
     @RequestMapping("/thymeleaf")
     public String thymeleaf(Model model) {

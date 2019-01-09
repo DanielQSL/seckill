@@ -65,11 +65,11 @@ public class OrderServiceImpl implements OrderService {
         orderInfo.setStatus(0);
         orderInfo.setUserId(user.getId());
 
-        long orderId = orderDao.insert(orderInfo);
+        orderDao.insert(orderInfo);
 
         SeckillOrder order = new SeckillOrder();
         order.setGoodsId(goods.getId());
-        order.setOrderId(orderId);
+        order.setOrderId(orderInfo.getId());
         order.setUserId(user.getId());
 
         orderDao.insertSeckillOrder(order);
